@@ -18,27 +18,32 @@ odrv0 = odrive.find_any()
 print("found an odrive!")
 
 # Apply configuration settings:
-odrv0.axis0.motor.config.pole_pairs = 11 # 24N22P
-odrv0.axis0.motor.config.torque_constant = 1.0 # Set torque units to Amps.
-odrv0.axis0.motor.config.current_lim = 10.0
+odrv0.axis0.motor.config.pole_pairs = 21 # 21 pole pairs ??
+odrv0.axis0.motor.config.torque_constant = 1.0 # Set torque units to Amps. #leave 1 for now
+odrv0.axis0.motor.config.current_lim = 10.0 #power supply is 10amps
 odrv0.axis0.motor.config.motor_type = en.MOTOR_TYPE_HIGH_CURRENT
-odrv0.axis0.controller.config.vel_limit = 5 # RPS
+odrv0.axis0.controller.config.vel_limit = 50 # RPS ??
 
 odrv0.axis0.motor.config.pre_calibrated = False
 odrv0.axis0.encoder.config.pre_calibrated = False
-odrv0.axis0.encoder.config.use_index = True
+odrv0.axis0.encoder.config.use_index = False # no index signal
+
+# AS5048a configuration:                                                                                                
+odrv0.axis0.encoder.config.abs_spi_cs_gpio_pin = 4 # CS on GPIO pin 3.                                                  
+odrv0.axis0.encoder.config.mode = en.ENCODER_MODE_SPI_ABS_AMS                                                           
+odrv0.axis0.encoder.config.cpr = 2**14 
 
 # Increase default calibration settings for this particular gimbal motor.
-odrv0.axis0.motor.config.resistance_calib_max_voltage = 5.0
-odrv0.axis0.motor.config.calibration_current = 1.0
+odrv0.axis0.motor.config.resistance_calib_max_voltage = 24.0
+odrv0.axis0.motor.config.calibration_current = 2.0 # current used to do the measurement 
 
 # TODO: if we enable flyback resistor, do we need to increase this value?
-odrv0.config.dc_max_negative_current = -0.1
+odrv0.config.dc_max_negative_current = -0.1 # max of 100mA back to the power supply
 
 # Calibrate:
 print("starting calibration...")
-odrv0.axis0.requested_state = en.AXIS_STATE_FULL_CALIBRATION_SEQUENCE
-while odrv0.axis0.current_state != en.AXIS_STATE_IDLE:
+odrv0.axis0.requested_state = en.AXIS_STATE_FULL_CALIBRATION_SEQUENCE # do the calibration
+while odrv0.axis0.current_state != en.AXIS_STATE_IDLE: # wait until idle again
     time.sleep(0.1)
 
 # Tell calibration to persist beyond powerdown.
@@ -52,13 +57,13 @@ try:
 except fibre.libfibre.ObjectLostError:
     pass
 
-odrv0 = odrive.find_any()
+odrv0 = odrive.find_any() # find USB again
 
-print("Homing...")
-odrv0.axis0.requested_state = en.AXIS_STATE_ENCODER_INDEX_SEARCH
-while odrv0.axis0.current_state != en.AXIS_STATE_IDLE:
-    time.sleep(0.1)
-print("Homed.")
+# print("Homing...")
+# odrv0.axis0.requested_state = en.AXIS_STATE_ENCODER_INDEX_SEARCH
+# while odrv0.axis0.current_state != en.AXIS_STATE_IDLE:
+#     time.sleep(0.1)
+# print("Homed.")
 
 
 ## Setup Torque Control
@@ -75,3 +80,9 @@ print("Homed.")
 #odrv0.axis0.controller.input_torque = 0
 #odrv0.axis0.requested_state = en.AXIS_STATE_IDLE
 #print("done!")
+
+
+##TODO
+# how to enable power resistor
+# make sure the calibration works, won't tell you if there's bug
+# interative way mode to talk to Odrive 

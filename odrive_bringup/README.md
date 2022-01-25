@@ -1,7 +1,14 @@
 ## Computer Environment Setup
 
-1. Create a virtual environment
+1. Create a virtual environment - make sure the python package is not newer than 3.8.6
 1. Enter that new environment
 1. `pip install --upgrade odrive`
+
+- manual setup: 'odrivetool'
+
+
+## troubleshoot (windows)
+- If getting error of "[USB] Could not open USB device: -5": download Zadig and replace the driver to libusb (v1.2.6.0 for me). (https://docs.odriverobotics.com/troubleshooting.html#usb-connectivity-issues)
+
 
 
