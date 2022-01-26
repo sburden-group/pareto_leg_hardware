@@ -23,19 +23,23 @@ odrv0.axis0.motor.config.torque_constant = 1.0 # Set torque units to Amps. #leav
 odrv0.axis0.motor.config.current_lim = 10.0 #power supply is 10amps
 odrv0.axis0.motor.config.motor_type = en.MOTOR_TYPE_HIGH_CURRENT
 odrv0.axis0.controller.config.vel_limit = 50 # RPS ??
+odrv0.axis0.motor.config.current_lim = 20
+odrv0.axis0.motor.config.current_lim_margin = 8
+odrv0.axis0.motor.config.requested_current_range = 30
 
 odrv0.axis0.motor.config.pre_calibrated = False
 odrv0.axis0.encoder.config.pre_calibrated = False
 odrv0.axis0.encoder.config.use_index = False # no index signal
 
-# AS5048a configuration:                                                                                                
-odrv0.axis0.encoder.config.abs_spi_cs_gpio_pin = 4 # CS on GPIO pin 3.                                                  
-odrv0.axis0.encoder.config.mode = en.ENCODER_MODE_SPI_ABS_AMS                                                           
-odrv0.axis0.encoder.config.cpr = 2**14 
+# AS5048a configuration:
+odrv0.config.gpio3_mode = GPIO_MODE_DIGITAL
+odrv0.axis0.encoder.config.abs_spi_cs_gpio_pin = 3 # CS on GPIO pin 3.
+odrv0.axis0.encoder.config.mode = en.ENCODER_MODE_SPI_ABS_AMS
+odrv0.axis0.encoder.config.cpr = 2**14
 
 # Increase default calibration settings for this particular gimbal motor.
-odrv0.axis0.motor.config.resistance_calib_max_voltage = 24.0
-odrv0.axis0.motor.config.calibration_current = 2.0 # current used to do the measurement 
+odrv0.axis0.motor.config.resistance_calib_max_voltage = 12.0
+odrv0.axis0.motor.config.calibration_current = 2.5 # current used to do the measurement
 
 # TODO: if we enable flyback resistor, do we need to increase this value?
 odrv0.config.dc_max_negative_current = -0.1 # max of 100mA back to the power supply
