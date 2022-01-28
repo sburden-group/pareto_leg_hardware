@@ -14,3 +14,7 @@
 ## Hardware Troubleshooting
 - Encoders need to be rebooted if you change the config, so everything needs to be power-cycled.
 - Wait for the LED to burn out before turning power back on.
+
+
+## Reflashing:
+- in `tup.config`, board should be set to `ONFIG_BOARD_VERSION=v3.5-48V`
