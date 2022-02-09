@@ -2,7 +2,7 @@
 """Bringup script for provisioning an odrive."""
 
 # Hardware Setup:
-#   * TMotor U8 (?)
+#   * TMotor U8 KV100
 #   * AS5048a absolute encoder installed
 #   * Power resistor installed (but not configured currently).
 
