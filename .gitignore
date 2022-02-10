@@ -1,0 +1,8 @@
+__pycache__
+*.swp
+*.pyc
+*.ipynb_checkpoints
+
+# Kicad
+*-backups/
+*-info-cache

@@ -55,10 +55,21 @@ class FiveBarKinematics2D(object):
 
         l3 = math.sqrt(x**2 + y**2)
         # flipped args so our angle is measured from lower vertical segment
-        theta6 = math.atan2(x,y)
+        theta6 = math.atan2(x,-y) # angle is measured ccw from (0, -1)
         theta7 = math.acos((l1**2 + l3**2 - l2**2)/(2*l1*l3)) # law o cosines
         theta2 = theta7 + theta6
         theta4 = theta7 - theta6
+
+        # Clamp angles between (-pi, +pi)
+        while theta2 < -math.pi:
+            theta2 += 2*math.pi
+        while theta2 > math.pi:
+            theta2 -= 2*math.pi
+
+        while theta4 < -math.pi:
+            theta4 += 2*math.pi
+        while theta4 > math.pi:
+            theta4 -= 2*math.pi
 
         return (theta2, theta4)
 
