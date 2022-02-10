@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Pareto Leg Class"""
 
-# include some odrive stuff as needed.
+import math
 
-class ParetoLeg(Object):
+class FiveBarKinematics2D(object):
 
-    def __init__(self, l1, l2, odrive):
+    def __init__(self, l1, l2):
+        """constructor. leg lengths can be any unit but must be consistent."""
+
         self.l1 = l1
         self.l2 = l2
 
     def forward_kinematics(self, joint_vector):
-        """Given joint angle vector, compute the XY position.
+        """Given joint angle vector (in radians), compute the XY position.
 
         Note: the coordinate frame origin for the robot is located at the center
               between the two motors.
@@ -28,8 +30,10 @@ class ParetoLeg(Object):
         #   femur and tibya lengths on "leglets" are the same.
 
         # Calculate virtual link length from origin to end effector.
-        theta3 = math.pi - (theta2 + theta4)
-        theta6 = 0.5*(theta2 - theta4)
+        theta6 = 0.5*(theta2 - theta4) # l3 angle away from vector: (0, -1)
+        theta5 = theta2 - theta6 # l2's opposite angle in l1 l2 l3 triangle
+        theta9 = math.asin(l1 * (math.sin(theta5)/l2)) # Law o Sines
+        theta3 = math.pi - theta5 - theta9
         l3 = math.sqrt(l1**2 + l2**2 - 2*l1*l2*math.cos(theta3)) # law o cosines
 
         # Polar to cartesian:
@@ -61,11 +65,11 @@ class ParetoLeg(Object):
 
     # Wrappers for foward/inverse kinematics:
     def joint_to_cartesian(self, joint_vector):
-        return forward_kinematics(joint_vector)
+        return self.forward_kinematics(joint_vector)
 
 
     def cartesian_to_joint(self, x_vector):
-        return inverse_kinematics(x_vector)
+        return self.inverse_kinematics(x_vector)
 
 
     # Control Hardware

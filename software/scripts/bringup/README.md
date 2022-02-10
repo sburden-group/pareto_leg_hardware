@@ -18,6 +18,3 @@
 
 ## Reflashing:
 - in `tup.config`, board should be set to `ONFIG_BOARD_VERSION=v3.5-48V`
-
-## Tests
-To run the tests, run `pytest-3 test_script.py`
