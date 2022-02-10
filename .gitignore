@@ -6,3 +6,6 @@ __pycache__
 # Kicad
 *-backups/
 *-info-cache
+
+# Kicad Personal Conventions
+gerbers/
