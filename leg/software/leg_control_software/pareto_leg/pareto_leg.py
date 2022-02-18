@@ -23,3 +23,12 @@ class ParetoLeg(object):
         """Get the position of the robot leg in cartesian coordinates."""
         theta_axis0, theta_axis1 = self.odd.get_positions()
         return self.kins.joint_to_cartesian(theta_axis0, theta_axis1)
+
+
+    def get_joint_position(self):
+        """Get the angular positionof each joint."""
+        pass
+
+    def get_joint_velocities(self):
+        """Get the angular velocity of each joint."""
+        pass
