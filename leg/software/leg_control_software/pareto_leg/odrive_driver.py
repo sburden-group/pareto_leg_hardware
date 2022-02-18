@@ -74,7 +74,7 @@ class OdriveDriver(object):
                 self.od.axis1.motor.current_control.Iq_measured)
 
 
-    def set_positions(self, axis0_pos, axis1_pos):
+    def set_motor_angles(self, axis0_pos, axis1_pos):
         """Set the angles of both motors in radians.
            Print message if we needed to switch modes first. Catch
            motor-related exceptions."""
@@ -91,10 +91,14 @@ class OdriveDriver(object):
             dump_errors(self.od)
 
 
-    def get_positions(self):
-        """Read both positions."""
-        # *.pos_estimate is the estimated position after running through the
-        # state observer to correct phase lag
+    def get_motor_angles(self):
+        """Read both positions from each odrive axis.
+
+        Note: looking top-down at the motor, CCW is positive rotation on both motors.
+
+        """
+        # *.pos_estimate is the estimated angle after running through the
+        # state observer to correct encoder phase lag.
         return (self.od.axis0.encoder.pos_estimate,
                 self.od.axis1.encoder.pos_estimate)
 
