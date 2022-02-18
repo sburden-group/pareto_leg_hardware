@@ -17,6 +17,12 @@ print("finding an odrive...")
 odrv0 = odrive.find_any()
 print("found an odrive!")
 
+# Apply general settings
+odrv0.config.enable_brake_resistor = True
+odrv0.config.brake_resistance = 2.0 # [Ohms]
+odrv0.config.max_regen_current = 30.0 # [Amps]
+odrv0.config.dc_max_negative_current = -0.5 # max of 500mA back to the power supply
+
 # Apply configuration settings:
 odrv0.axis0.motor.config.pole_pairs = 21 # 21 pole pairs ??
 odrv0.axis0.motor.config.torque_constant = 1.0 # Set torque units to Amps. #leave 1 for now
@@ -25,10 +31,6 @@ odrv0.axis0.controller.config.vel_limit = 50 # RPS ??
 odrv0.axis0.motor.config.current_lim = 30.0
 odrv0.axis0.motor.config.current_lim_margin = 8
 odrv0.axis0.motor.config.requested_current_range = 50
-odrv0.config.enable_brake_resistor = True
-odrv0.config.brake_resistance = 2.0 # [Ohms]
-odrv0.config.max_regen_current = 30.0 # [Amps]
-odrv0.config.dc_max_negative_current = -0.5 # max of 500mA back to the power supply
 
 odrv0.axis0.motor.config.pre_calibrated = False
 odrv0.axis0.encoder.config.pre_calibrated = False
