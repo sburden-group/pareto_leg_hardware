@@ -31,12 +31,12 @@ class OdriveDriver(object):
 
     def set_position_control_mode(self):
         self.set_mode(CONTROL_MODE_POSITION_CONTROL)
-        self.mode = CONTROL_MODE_POSITION_CONTROL
+        self.control_mode = CONTROL_MODE_POSITION_CONTROL
 
 
     def set_torque_control_mode(self):
         self.set_mode(CONTROL_MODE_TORQUE_CONTROL)
-        self.mode = CONTROL_MODE_TORQUE_CONTROL
+        self.control_mode = CONTROL_MODE_TORQUE_CONTROL
 
 
 # Homing:
@@ -56,7 +56,7 @@ class OdriveDriver(object):
            Print message if we needed to switch modes first. Catch
            motor-related exceptions."""
 
-        if self.mode != CONTROL_MODE_TORQUE_CONTROL:
+        if self.control_mode != CONTROL_MODE_TORQUE_CONTROL:
             print("Switching to Torque Control Mode.")
             self.set_torque_control_mode()
 
@@ -79,7 +79,7 @@ class OdriveDriver(object):
            Print message if we needed to switch modes first. Catch
            motor-related exceptions."""
 
-        if self.mode != CONTROL_MODE_POSITION_CONTROL:
+        if self.control_mode != CONTROL_MODE_POSITION_CONTROL:
             print("Switching to Position Control Mode.")
             self.set_position_control_mode()
 
