@@ -28,15 +28,17 @@ odrv0.config.dc_max_negative_current = -10.0 # [Amps] max negative current after
 odrv0.axis0.motor.config.pole_pairs = 21 # 21 pole pairs ??
 odrv0.axis0.motor.config.torque_constant = 1.0 # Set torque units to Amps. #leave 1 for now
 odrv0.axis0.motor.config.motor_type = en.MOTOR_TYPE_HIGH_CURRENT
-odrv0.axis0.controller.config.vel_limit = 50 # RPS ??
+odrv0.axis0.controller.config.vel_limit = 500 # RPS
 odrv0.axis0.motor.config.current_lim = 30.0
 odrv0.axis0.motor.config.current_lim_margin = 8
 odrv0.axis0.motor.config.requested_current_range = 50.0
 odrv0.axis0.controller.config.pos_gain = 20.0
 odrv0.axis0.controller.config.vel_gain = 0.8
 odrv0.axis0.controller.config.vel_integrator_gain = 4.0
-odrv0.axis0.motor.config.current_control_bandwidth = 2000.0
+odrv0.axis0.motor.config.current_control_bandwidth = 1000.0
 odrv0.axis0.controller.config.enable_torque_mode_vel_limit = False # not needed for position mode.
+odrv0.axis0.controller.config.control_mode = en.CONTROL_MODE_POSITION_CONTROL
+odrv0.axis0.controller.config.input_mode = en.INPUT_MODE_PASSTHROUGH
 
 odrv0.axis0.motor.config.pre_calibrated = False
 odrv0.axis0.encoder.config.pre_calibrated = False
@@ -48,15 +50,17 @@ odrv0.axis0.encoder.config.use_index = False # no dedicated index signal
 odrv0.axis1.motor.config.pole_pairs = 21 # 21 pole pairs ??
 odrv0.axis1.motor.config.torque_constant = 1.0 # Set torque units to Amps. #leave 1 for now
 odrv0.axis1.motor.config.motor_type = en.MOTOR_TYPE_HIGH_CURRENT
-odrv0.axis1.controller.config.vel_limit = 50 # RPS ??
+odrv0.axis1.controller.config.vel_limit = 500 # RPS
 odrv0.axis1.motor.config.current_lim = 30.0
 odrv0.axis1.motor.config.current_lim_margin = 8
 odrv0.axis1.motor.config.requested_current_range = 50
 odrv0.axis1.controller.config.pos_gain = 20.0
 odrv0.axis1.controller.config.vel_gain = 0.8
 odrv0.axis1.controller.config.vel_integrator_gain = 4.0
-odrv0.axis1.motor.config.current_control_bandwidth = 2000.0
+odrv0.axis1.motor.config.current_control_bandwidth = 1000.0
 odrv0.axis1.controller.config.enable_torque_mode_vel_limit = False # not needed for position mode
+odrv0.axis0.controller.config.control_mode = en.CONTROL_MODE_POSITION_CONTROL
+odrv0.axis0.controller.config.input_mode = en.INPUT_MODE_PASSTHROUGH
 
 odrv0.axis1.motor.config.pre_calibrated = False
 odrv0.axis1.encoder.config.pre_calibrated = False
@@ -116,7 +120,7 @@ except fibre.libfibre.ObjectLostError:
     pass
 
 odrv0 = odrive.find_any() # find USB again
-print("Done calibrating!")
+print("Done configuring!")
 
 # print("Homing...")
 # odrv0.axis0.requested_state = en.AXIS_STATE_ENCODER_INDEX_SEARCH
