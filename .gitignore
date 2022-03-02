@@ -9,3 +9,6 @@ __pycache__
 
 # Kicad Personal Conventions
 gerbers/
+
+# Python Package Stuff
+*.egg-info

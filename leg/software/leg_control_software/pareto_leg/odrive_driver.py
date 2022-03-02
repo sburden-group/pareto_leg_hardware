@@ -2,6 +2,7 @@
 """Driver for controlling both ODrive axes."""
 from inpromptu import Inpromptu, cli_method
 
+from math import pi
 
 from odrive.utils import dump_errors
 from odrive.enums import *
@@ -12,7 +13,11 @@ import odrive
 class OdriveDriver(Inpromptu):
 
     def __init__(self, odrive):
-        """constructor. Assumes odrives have already been configured."""
+        """constructor.
+
+        Assumes odrives have already been configured according to the bringup
+        script."""
+        super().__init__()
         self.od = odrive
         self.control_mode = None
         self.reset()
@@ -25,9 +30,7 @@ class OdriveDriver(Inpromptu):
         self.set_position_control_mode()
         self.od.axis0.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
         self.od.axis1.controller.config.input_mode = INPUT_MODE_PASSTHROUGH
-        self.od.axis0.requested_state = AXIS_STATE_IDLE
-        self.od.axis0.requested_state = AXIS_STATE_IDLE
-        self.set_position_control_mode()
+        self.disarm()
 
 
     @cli_method
@@ -37,8 +40,14 @@ class OdriveDriver(Inpromptu):
         self.od.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
 
-# Modes:
     @cli_method
+    def disarm(self):
+        """disarm the leg motors."""
+        self.od.axis0.requested_state = AXIS_STATE_IDLE
+        self.od.axis1.requested_state = AXIS_STATE_IDLE
+
+
+# Modes:
     def set_mode(self, mode):
         self.od.axis0.controller.config.control_mode = mode
         self.od.axis1.controller.config.control_mode = mode
@@ -46,12 +55,14 @@ class OdriveDriver(Inpromptu):
 
     @cli_method
     def set_position_control_mode(self):
+        """Wrapper for setting position control mode."""
         self.set_mode(CONTROL_MODE_POSITION_CONTROL)
         self.control_mode = CONTROL_MODE_POSITION_CONTROL
 
 
     @cli_method
     def set_torque_control_mode(self):
+        """Wrapper for setting torque control mode."""
         self.set_mode(CONTROL_MODE_TORQUE_CONTROL)
         self.control_mode = CONTROL_MODE_TORQUE_CONTROL
 
@@ -70,7 +81,7 @@ class OdriveDriver(Inpromptu):
 
 # Position and Torque Control Read and Writes:
     @cli_method
-    def set_torques(self, axis0_torque, axis1_torque):
+    def set_torques(self, axis0_torque: float, axis1_torque: float):
         """set the torque on both motors in [Amps].
            Print message if we needed to switch modes first. Catch
            motor-related exceptions."""
@@ -94,8 +105,7 @@ class OdriveDriver(Inpromptu):
                 self.od.axis1.motor.current_control.Iq_measured)
 
 
-    @cli_method
-    def set_motor_angles(self, axis0_pos, axis1_pos):
+    def set_motor_angles(self, axis0_angle_rad, axis1_angle_rad):
         """Set the angles of both motors in radians.
            Print message if we needed to switch modes first. Catch
            motor-related exceptions."""
@@ -105,24 +115,62 @@ class OdriveDriver(Inpromptu):
             self.set_position_control_mode()
 
         try:
-            self.od.axis0.controller.input_pos = axis0_pos
-            self.od.axis1.controller.input_pos = axis1_pos
+            # Convert radians to revolutions.
+            self.od.axis0.controller.input_pos = axis0_angle_rad / (2 * pi)
+            self.od.axis1.controller.input_pos = axis1_angle_rad / (2 * pi)
         except Exception as e:
-            print(e.message)
+            print(str(e))
+            print("ODrive Status Dump:")
             dump_errors(self.od)
 
 
     @cli_method
-    def get_motor_angles(self):
-        """Read both positions from each odrive axis.
+    def set_motor_angles_deg(self, axis0_angle_deg: float, axis1_angle_deg: float):
+        return self.set_motor_angles(axis0_angle_deg * (pi/180),
+                                     axis1_angle_deg * (pi/180))
 
-        Note: looking top-down at the motor, CCW is positive rotation on both motors.
+
+    @cli_method
+    def get_motor_angles(self):
+        """Read both angles (in radians) from each odrive axis.
+
+        Note: looking top-down at the motor, CCW rotation is positive on each motor.
 
         """
         # *.pos_estimate is the estimated angle after running through the
         # state observer to correct encoder phase lag.
-        return (self.od.axis0.encoder.pos_estimate,
-                self.od.axis1.encoder.pos_estimate)
+        return (self.od.axis0.encoder.pos_estimate * 2 * pi,
+                self.od.axis1.encoder.pos_estimate * 2 * pi)
+
+
+    def configure_motor_angles_as(self, axis0_angle_rad: float, axis1_angle_rad: float):
+        """Set the current motor angles to be a specific value in radians."""
+
+        axis0_cpr = self.od.axis0.encoder.config.cpr
+        axis1_cpr = self.od.axis1.encoder.config.cpr
+
+        curr_pos_rad = self.get_motor_angles()
+
+        #new_angle_rad = [curr_pos_rad[0] + axis0_angle_rad,
+        #                 curr_pos_rad[1] + axis1_angle_rad]
+        new_angle_rad = [axis0_angle_rad,
+                         axis1_angle_rad]
+
+        # Clamp above values to (-pi, +pi)
+        for index, angle in enumerate(new_angle_rad):
+            while new_angle_rad[index] < -pi:
+                new_angle_rad[index] += 2*pi
+            while new_angle_rad[index] > pi:
+                new_angle_rad[index] -= 2*pi
+
+        self.od.axis0.encoder.set_linear_count(new_angle_rad[0]/(2*pi)*axis0_cpr)
+        self.od.axis1.encoder.set_linear_count(new_angle_rad[1]/(2*pi)*axis1_cpr)
+
+
+    @cli_method
+    def configure_motor_angle_degs_as(self, axis0_angle_deg: float, axis1_angle_deg: float):
+        self.configure_motor_angles_as(axis0_angle_deg * (pi/180),
+                                       axis1_angle_deg * (pi/180))
 
 
     @cli_method
