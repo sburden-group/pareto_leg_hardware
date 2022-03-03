@@ -143,6 +143,19 @@ class OdriveDriver(Inpromptu):
                 self.od.axis1.encoder.pos_estimate * 2 * pi)
 
 
+    @cli_method
+    def get_motor_velocities(self):
+        """Read both angle velocities (in radians) from each odrive axis.
+
+        Note: looking top-down at the motor, CCW rotation is positive on each motor.
+
+        """
+        # *.pos_estimate is the estimated angle after running through the
+        # state observer to correct encoder phase lag.
+        return (self.od.axis0.encoder.vel_estimate * 2 * pi,
+                self.od.axis1.encoder.vel_estimate * 2 * pi)
+
+
     def configure_motor_angles_as(self, axis0_angle_rad: float, axis1_angle_rad: float):
         """Set the current motor angles to be a specific value in radians."""
 
