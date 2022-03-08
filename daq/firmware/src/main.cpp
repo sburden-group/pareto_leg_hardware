@@ -106,14 +106,14 @@ static void usb_set_config_cb(usbd_device *usbd_dev, uint16_t wValue)
 }
 
 
-// Set sampling frequency at values up to 50[KHz]
-// Some rounding error will occur at non-integer division ratios for
-// frequencies on the order of KHz.
+// Set sampling frequency at values between 15.26[Hz] and 1[MHz]
+// not all frequencies are possible.
 // Pause and re-enable TIM7 interrupt by default unless told to ignore.
 void set_sampling_freq(uint32_t hz, bool ignore_irq_state = false)
 {
-    uint32_t ticks = 1000/hz; // Note: default timer ticks at 100 [KHz].
-    // 10000 ticks for 10[Hz]. 100 ticks for 1[KHz]. 25 ticks for 4[KHz]. etc.
+    uint32_t ticks = 1e6/hz; // Note: timer is set to tick at 1 [MHz].
+    // 1 tick for 1[MHz]. 1000 ticks for 1[KHz]. 4000 ticks for 250[Hz]. etc.
+    // eqn is: UPDATE_FREQ = TICK_RATE / PERIOD
     if (!ignore_irq_state)
         nvic_disable_irq(NVIC_TIM7_IRQ);
     timer_set_period(TIM7, ticks);
@@ -130,12 +130,20 @@ void setup_sampling_timer(void)
     nvic_enable_irq(NVIC_TIM7_IRQ);
     rcc_periph_reset_pulse(RST_TIM7); // reset timer 7 to defaults.
 
+// Primary Datasheet for STM32F415xx Sec 2.2, Fig 5 has clock APB mapping.
+// RM0090 Manual for Sec 7.2, Fig 21 has the clock tree (prescaling) mapping.
+// TIM7 uses APB1.
+// For current clock (rcc) settings, we have:
+// AHB --> no prescaling
+// APB1 --> DIV4
+// CLK_INT --> 168000000 / 4 x 2 = 84 [MHz]
+
     timer_set_mode(TIM7,
                    TIM_CR1_CKD_CK_INT, // No additional clock division ratio.
                    TIM_CR1_CMS_EDGE, // Edge alignment.
                    TIM_CR1_DIR_UP); // Up-counting counter
 
-    timer_set_prescaler(TIM7, 168000); // 1KHz per increment
+    timer_set_prescaler(TIM7, 84); // Increment at 1[MHz]
     set_sampling_freq(DEFAULT_SAMPLING_FREQ, true); // don't alter irq state.
     timer_disable_preload(TIM7);
 	timer_continuous_mode(TIM7);
