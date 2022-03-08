@@ -25,7 +25,7 @@
 
 
 // ------ Constants: ------
-static const size_t DEFAULT_SAMPLING_FREQ = 100; // [Hz]
+static const size_t DEFAULT_SAMPLING_FREQ = 5000; // [Hz]
 static const size_t DATAPTS_PER_PKT = 30; // number of samples in a USB packet.
 
 
@@ -166,7 +166,7 @@ void otg_fs_isr(void)
 void tim7_isr(void)
 {
     timer_clear_flag(TIM7, TIM_SR_UIF);
-    //gpio_toggle(GPIOA, GPIO8);
+    gpio_toggle(GPIOA, GPIO8);
     system_state.adc_read_pending = true;
 }
 
@@ -175,7 +175,6 @@ void tim7_isr(void)
 // Flag if the usb data is full and ready for transfer.
 void sample_and_store_datapt(void)
 {
-
     sampling_buffer->analog_time_series[usb_pkt_datapt_index] =
         read_adc_naiive(ADC1, 8); // PB0 is ADC1_IN8.
 
@@ -272,7 +271,7 @@ int main(void)
             // Cast the struct into a serialized sequence of bytes.
             usbd_ep_write_packet(usbd_dev, 0x81, (const void*)usb_writing_buffer,
                                  BULK_BUFFER_SIZE);
-            gpio_toggle(GPIOA, GPIO8);
+            //gpio_toggle(GPIOA, GPIO8);
         }
     }
 
