@@ -46,7 +46,7 @@ def collect_data(recording_time_s, usb_daq):
     # Continue recording until time is up
     while (time.perf_counter() - start_time_s) < recording_time_s:
         packet_index, new_data = collect_usb_packet(usb_daq)
-        print(packet_index)
+        print(f"Receiving 64-byte packet: {packet_index}", end="\r", flush=True)
         # If we've read this packet before, skip it.
         if (packet_index == last_packet_index):
             continue
@@ -65,6 +65,7 @@ def collect_data(recording_time_s, usb_daq):
         # Default case:
         agg_measurements.extend(new_data)
         last_packet_index = packet_index
+    print()
 
     return agg_measurements
 
@@ -107,7 +108,7 @@ def write_data_to_file(data, filename):
 
 if __name__ == "__main__":
     parser  = argparse.ArgumentParser()
-    parser.add_argument("--acquire_data_seconds", type=int, default=1)
+    parser.add_argument("--seconds", type=int, default=1)
     parser.add_argument("--simulated", type=bool, default=False)
 
 
@@ -136,5 +137,5 @@ if __name__ == "__main__":
             sys.exit()
 
 
-    data = collect_data(args.acquire_data_seconds, usb_daq)
+    data = collect_data(args.seconds, usb_daq)
     write_data_to_file(data,"data.txt")
