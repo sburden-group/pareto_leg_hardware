@@ -135,6 +135,7 @@ class OdriveDriver(Inpromptu):
         """Read both angles (in radians) from each odrive axis.
 
         Note: looking top-down at the motor, CCW rotation is positive on each motor.
+        Note: Angles (radians) are not clamped and not calibrated.
 
         """
         # *.pos_estimate is the estimated angle after running through the

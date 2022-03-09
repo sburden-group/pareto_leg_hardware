@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Demo for connecting to Julia."""
+
+from pareto_leg.odrive_driver import OdriveDriver
+import odrive
+
+import time
+import numpy as np
+from numpy import pi
+
+import julia
+# Setup Julia package with Hopper/Handshake Dynamics
+from julia import Pkg, Main
+print("Setting up Julia pareto-leg-control package... ", end="")
+Pkg.activate("../") # This string points to the pareto-leg-control folder.
+#Pkg.instantiate() # This needs to be called once ever. TODO: FIXME. This is bad practice.
+Main.include("../ParetoLegControljl")
+print("Done!")
+
+
+# bind included modules to variables:
+model = Main.model
+designs = Main.designs
+controller = Main.hopper
+
+# design parameters for a sample robot.
+# design parameters, see Designs.jl for description of the arguments
+leg_params = designs.Params(
+    .1,         # Ext Spring 1 free length
+    100.,       # Ext Spring 1 Spring Constant
+    0.0,        # Ext Spring 1 Initial Tension
+    3.14/4,     # Ext Spring 1 Rest angle
+    .1,         # Ext Spring 2 Free Length
+    100.,       # Ext Spring 2 Spring Constant
+    0.0,        # Ext Spring 2 Initial Tension
+    -3.14/4,    # Ext Spring 2 Rest Angle
+    .27,        # Comp Spring Free Length
+    500.,       # Comp Spring Spring Constant
+    .07,        # Femur Length
+    .2          # Tibya Length
+)
+
+# Starting Configuration: a particular configuration and velocity.
+q = np.array([0., # first element is a placeholder. TODO: what actually is it
+              pi/4,  # joint 0
+              -pi/4, # joint 1
+              0.,       # x?
+              0.])      # y?
+q[0] = model.leg_length(q, leg_params) # replace placeholder.
+qdot = np.zeros(len(q))
+
+
+if __name__ == "__main__":
+
+    # Constants
+    LOOP_TIME_S = 0.01 # [sec]. How long between sending new data to the ODrive
+
+    # Calibration Constants for such that the controller and the real-world
+    # joint angles match.
+    CALIB_POSITION = np.asarray([pi/2, -pi/2]) # [rad]. Calibration "stance"
+    CALIB_MEASUREMENT = np.asarray([-1.38, 3.35])   # Measured real-world angles
+                                                    # when the robot is in the
+                                                    # calibration "stance".
+
+    # Hardware Connection Setup:
+    print("Connecting to ODrive... ", end="")
+    odrv0 = odrive.find_any()
+    my_odd = OdriveDriver(odrv0)
+    my_odd.set_torque_control_mode()
+    my_odd.arm()
+    print("Done.")
+
+# Julia's JIT compiler needs to compile every function the first time it sees it
+# with a new function signature. Call everything here that we will need to
+# call in the main loop.
+    print("Compiling Julia Routines... ", end="")
+    output_torque = controller.stance_control(q, qdot, leg_params)
+    print("Done!")
+
+    curr_time_s = time.perf_counter()
+    prev_time_s = curr_time_s
+
+# Main Loop.
+# Feedback Linearization.
+#   At every iteration, read in the current position and (estimated) velocity
+#   angles of each joint (this is the state vector), and write
+#   back an output torque command for each joint give the current state.
+# Note that this scheme is time-invariant. We are imposing particular dynamics
+#   onto the robot leg such that the robot leg behaves in a way that emulates
+#   these dynamics. We simply need to stream output commands at a fast enough
+#   rate such that we can reproduce all the main frequency components of the
+#   dynamics.
+    while True:
+        curr_time_s = time.perf_counter()
+        if (curr_time_s - prev_time_s) > LOOP_TIME_S:
+
+            # Get Measurements: flip sign on motor 0 to match world config.
+            raw_angles = np.array(my_odd.get_motor_angles()) * np.array([-1, 1]) # flip sign
+            # Create position state vector chunk.
+            q = thetas + CALIB_POSITION - CALIB_MEASUREMENT
+            qdot = np.array(my_odd.get_motor_velocities()) * np.array([-1, 1]) # flip sign.
+            #print(f"q is:    ({q[0]:.3f}, {q[1]:.3f})", end=" ")
+            #print(f"qdot is: ({qdot[0]:.3f}, {qdot[0]:.3f})")
+
+            # Update Motor Torques:
+            output_torque = controller.stance_control(q, qdot, leg_params)
+            output_current = output_torque/model.Ke
+            tf_current_a = current_a * np.array([-1, 1])
+            my_odd.set_torques(*tf_current_a) # should be in Amps.
+
+            # Setup next loop interation.
+            prev_time_s = curr_time_s
+
