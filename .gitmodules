@@ -1,3 +1,6 @@
 [submodule "daq/firmware/libopencm3"]
 	path = daq/firmware/libopencm3
 	url = git@github.com:libopencm3/libopencm3.git
+[submodule "leg/software/pareto-leg-control"]
+	path = leg/software/pareto-leg-control
+	url = git@github.com:sburden-group/pareto-leg-control.git

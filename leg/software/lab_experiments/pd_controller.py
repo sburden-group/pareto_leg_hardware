@@ -70,7 +70,7 @@ if __name__ == "__main__":
             current_a = my_controller.update(q, qdot)
             print(f"({current_a[0]:.4f}, {current_a[1]:.4f})")
             tf_current_a = current_a * np.array([-1, 1])
-            my_odd.set_torques(*tf_current_a)
+            my_odd.set_torques(*tf_current_a) # should be in Amps.
             # Setup for next loop interation.
             prev_time_s = curr_time_s
 
