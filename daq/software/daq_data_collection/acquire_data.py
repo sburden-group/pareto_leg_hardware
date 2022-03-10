@@ -138,4 +138,4 @@ if __name__ == "__main__":
 
 
     data = collect_data(args.seconds, usb_daq)
-    write_data_to_file(data,"data.txt")
+    write_data_to_file(data,"data.csv")
