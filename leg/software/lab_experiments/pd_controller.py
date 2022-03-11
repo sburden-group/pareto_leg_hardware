@@ -13,14 +13,14 @@ CONTROL_LOOP_TIME_S = 0.01 # seconds (update rate of 10 Hz)
 class PDController(object):
 
     def __init__(self):
-        self.Kp = 180/6.28/100 * 6
-        self.Kd = self.Kp/4
+        self.Kp = 180/6.28/100*8
+        self.Kd = 0.1*(self.Kp)**0.5 
 
 
     def update(self, q, qdot):
         """Perform control loop update."""
-        error = [pi/8-q[0],
-                -pi/8-q[1]]
+        error = [0-q[0],
+                -pi/2-q[1]]
         error_dot = [-qdot[0],
                      -qdot[1]]
 
@@ -30,8 +30,8 @@ class PDController(object):
 
 if __name__ == "__main__":
 
-    CALIB_MEASUREMENT = np.asarray([-1.38, 3.35])
-    CALIB_POSITION = np.asarray([pi/2, -pi/2])
+    CALIB_POSITION = np.asarray([pi/2, -pi/2]) # [rad]. Calibration "stance"
+    CALIB_MEASUREMENT = np.asarray([-1.316, -2.99])   # Measured real-world angles
 
     print("Connecting to ODrive.")
     odrv0 = odrive.find_any()

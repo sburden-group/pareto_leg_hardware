@@ -10,4 +10,4 @@
 
 ## Setup
 **pareto-leg-control** is a separate Julia package with Python bindings installed as a submodule.
-If you do not see it present as a directory, you need to download it with `git submodule init` followed by `git submodule update`.
+If you do not see it present as a directory, you need to download it with `git submodule init` followed by `git submodule update`.i
