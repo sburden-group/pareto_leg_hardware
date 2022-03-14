@@ -19,7 +19,7 @@ class PDController(object):
 
     def update(self, q, qdot):
         """Perform control loop update."""
-        error = [0-q[0],
+        error = [pi/2-q[0],
                 -pi/2-q[1]]
         error_dot = [-qdot[0],
                      -qdot[1]]
