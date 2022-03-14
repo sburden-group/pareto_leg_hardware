@@ -8,24 +8,28 @@ import time, sys
 import numpy as np
 from numpy import pi
 
+# Connect to ODrive.
+# Get Starting Position
+
+# Hardware Connection Setup:
+print("Connecting to ODrive... ")
+odrv0 = odrive.find_any(timeout=1)
+print("Connected!")
+my_odd = OdriveDriver(odrv0)
+my_odd.set_torque_control_mode()
+my_odd.arm()
+
 import julia
-from julia.core import UnsupportedPythonError
-# Setup Julia package with Hopper/Handshake Dynamics
-try:
-    from julia import Pkg, Main
-except UnsupportedPythonError as e:
-    print("Error: this script must be un with python-jl interpreter.")
-    sys.exit()
+from julia import Pkg
 
 print("Setting up Julia pareto-leg-control package... ")
-Pkg.activate("../pareto-leg-control") # This string points to the pareto-leg-control folder.
-Pkg.instantiate() # This needs to be called once ever. TODO: FIXME. This is bad practice.
-Main.include("../pareto-leg-control/ParetoLegControl.jl")
+Pkg.activate("../pareto-leg-control/LegControllers") # This string points to the pareto-leg-control folder.
 
 # bind included modules to variables:
-model = Main.Model
-designs = Main.Designs
-controller = Main.ComputedTorque
+from julia import LegControllers
+model = LegControllers.Model
+designs = LegControllers.Designs
+controller = LegControllers.ComputedTorque
 
 # design parameters for a sample robot.
 # design parameters, see Designs.jl for description of the arguments
@@ -44,15 +48,6 @@ leg_params = designs.Params(
     .2          # Tibya Length
 )
 
-# Connect to ODrive.
-# Get Starting Position
-
-# Hardware Connection Setup:
-print("Connecting to ODrive... ")
-odrv0 = odrive.find_any(timeout=1)
-my_odd = OdriveDriver(odrv0)
-my_odd.set_torque_control_mode()
-#my_odd.arm()
 
 ## Calibration Constants for such that the controller and the real-world
 ## joint angles match.
@@ -60,8 +55,6 @@ CALIB_POSITION = np.asarray([pi/2, -pi/2]) # [rad]. Calibration "stance"
 CALIB_MEASUREMENT = np.asarray([-1.316, -2.99])   # Measured real-world angles
                                                   # when the robot is in the
                                                   # calibration "stance".
-
-
 def get_state():
     """returns the state vector by querying the ODrive for required data."""
 
@@ -102,15 +95,22 @@ def get_state():
 
     return q, qdot
 
-def pd_controller(q,qdot):
-    Kp = 36
-    Kd = 2
-    eq = np.array([-0.1,-0.25])
-    command = Kp*(eq-q[3:5])-Kd*qdot[3:5]
-    error = [eq[0]-q[3],eq[1]-q[4]]
+def pd_controller(q,qdot,p):
+    error = p-q[[3,4]]
     print(f'error: ({error[0]:.3f},{error[1]:.3f})')
-    u = controller.control(q,qdot,leg_params,command)
-    return u
+    if q[1]-q[2]>0.6:
+        Kp = 25
+        Kd = 2.5
+        command = Kp*(p-q[3:5])-Kd*qdot[3:5]
+        u = controller.control(q,qdot,leg_params,command)
+        return u
+    else: # close to a hard stop, so we turn of Kd gain to avoid high frequency stimulus
+        Kp = 25
+        Kd = 0
+        command = Kp*(p-q[3:5])-Kd*qdot[3:5]
+        u = controller.control(q,qdot,leg_params,command)
+        return u
+
 
 ## Constants
 LOOP_TIME_S = 0.01 # [sec]. How long between sending new data to the ODrive
@@ -127,12 +127,22 @@ LOOP_TIME_S = 0.01 # [sec]. How long between sending new data to the ODrive
 curr_time_s = time.perf_counter()
 prev_time_s = curr_time_s
 my_odd.arm()
+waypoints = [[0.,-.20],[-0.15,-.20],[-0,-.27],[+.15,-.2]]
+idx = 0
+waypoint = waypoints[idx]
+waypoint_update_time_s = curr_time_s
 while True:
     curr_time_s = time.perf_counter()
+    if curr_time_s - waypoint_update_time_s > 3. and idx < len(waypoints)-1:
+        idx = idx + 1
+        waypoint = waypoints[idx]
+        waypoint_update_time_s = curr_time_s
     if (curr_time_s - prev_time_s) > LOOP_TIME_S:
         q, qdot = get_state()
-        u = pd_controller(q,qdot)
+#        u = pd_controller(q,qdot,waypoint)
+        u = pd_controller(q,qdot,waypoints[idx])
         current_a = u / model.Ke
         my_odd.set_torques(*(current_a*np.array([-1,1])))
         prev_time_s = curr_time_s
 
+#!/usr/bin/env python-jl
