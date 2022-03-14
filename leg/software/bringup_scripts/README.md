@@ -17,4 +17,10 @@
 
 
 ## Reflashing:
-- in `tup.config`, board should be set to `ONFIG_BOARD_VERSION=v3.5-48V`
+- in `tup.config`, board should be set to `CONFIG_BOARD_VERSION=v3.5-48V`
+- To compile the firmware, invoke `make` from the top level directory.
+- To flash the firmware, invoke `make dfu`.
+If the flashing doesn't work, you may need to power the board up with the board's Dip switch set to DFU, invoke `make dfu`, and the flip the Dip switch back to RUN and reboot the board.
+
+
+

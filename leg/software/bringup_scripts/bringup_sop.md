@@ -1,5 +1,7 @@
 # Bringup
 
+Note: this process is kinda involved and should really be automated with a script.
+
 Run the **odrivetool** utility.
 
 Power up the PSU and apply 24V to the board.
@@ -12,6 +14,8 @@ If there are no errors, close the odrive utility.
 run `bringup.py` to upload the Dual TMotor U8 motor configuration for each axis.
 
 Reopen the odrive utility. Check that there no errrors with `dump_errors(odrv0)`.
+
+Ensure that the motors are not connected to anything that would phyiscally constrain their movement (i.e: linkages).
 
 Run a motor0 calibration with:
 ````

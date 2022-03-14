@@ -37,8 +37,11 @@ odrv0.axis0.controller.config.vel_gain = 0.8
 odrv0.axis0.controller.config.vel_integrator_gain = 4.0
 odrv0.axis0.motor.config.current_control_bandwidth = 1000.0
 odrv0.axis0.controller.config.enable_torque_mode_vel_limit = False # not needed for position mode.
-odrv0.axis0.controller.config.control_mode = en.CONTROL_MODE_POSITION_CONTROL
+odrv0.axis0.controller.config.control_mode = en.CONTROL_MODE_TORQUE_CONTROL
 odrv0.axis0.controller.config.input_mode = en.INPUT_MODE_PASSTHROUGH
+odrv0.axis0.controller.config.enable_vel_limit = False
+odrv0.axis0.controller.config.enable_overspeed_error = False
+odrv0.axis0.controller.config.anticogging.anticogging_enabled = False
 
 odrv0.axis0.motor.config.pre_calibrated = False
 odrv0.axis0.encoder.config.pre_calibrated = False
@@ -59,8 +62,11 @@ odrv0.axis1.controller.config.vel_gain = 0.8
 odrv0.axis1.controller.config.vel_integrator_gain = 4.0
 odrv0.axis1.motor.config.current_control_bandwidth = 1000.0
 odrv0.axis1.controller.config.enable_torque_mode_vel_limit = False # not needed for position mode
-odrv0.axis1.controller.config.control_mode = en.CONTROL_MODE_POSITION_CONTROL
+odrv0.axis1.controller.config.control_mode = en.CONTROL_MODE_TORQUE_CONTROL
 odrv0.axis1.controller.config.input_mode = en.INPUT_MODE_PASSTHROUGH
+odrv0.axis1.controller.config.enable_vel_limit = False
+odrv0.axis1.controller.config.enable_overspeed_error = False
+odrv0.axis1.controller.config.anticogging.anticogging_enabled = False
 
 odrv0.axis1.motor.config.pre_calibrated = False
 odrv0.axis1.encoder.config.pre_calibrated = False
