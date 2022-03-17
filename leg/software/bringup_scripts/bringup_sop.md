@@ -38,5 +38,10 @@ odrv0.axis1.motor.config.pre_calibrated = True
 odrv0.axis0.encoder.config.pre_calibrated = True
 ````
 
+Now save the configuration with:
+````
+odrv0.save_configuration()
+````
+
 Close the odrive utility.
 
