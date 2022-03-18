@@ -13,7 +13,7 @@ CONTROL_LOOP_TIME_S = 0.01 # seconds (update rate of 10 Hz)
 class PDController(object):
 
     def __init__(self):
-        self.Kp = 180/6.28/100*8
+        self.Kp = 180/6.28/100*3
         self.Kd = 0.1*(self.Kp)**0.5 
 
 
