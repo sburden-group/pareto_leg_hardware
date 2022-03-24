@@ -11,13 +11,13 @@ from numpy import pi
 ## Calibration Constants for such that the controller and the real-world
 ## joint angles match.
 CALIB_POSITION = np.asarray([pi/2, -pi/2]) # [rad]. Calibration "stance"
-CALIB_MEASUREMENT = np.asarray([-1.316, -2.99])   # Measured real-world angles
+CALIB_MEASUREMENT = np.asarray([1.45, 1.73])   # Measured real-world angles
                                                 # when the robot is in the
                                                 # calibration "stance".
 
 # Hardware Connection Setup:
 print("Connecting to ODrive... ")
-odrv0 = odrive.find_any(timeout=1)
+odrv0 = odrive.find_any()
 my_odd = OdriveDriver(odrv0)
 
 ## Constants
@@ -28,7 +28,7 @@ while True:
     curr_time_s = time.perf_counter()
     if (curr_time_s - prev_time_s) > LOOP_TIME_S:
 #        # Get Measurements: flip sign on motor 0 to match world config.
-        theta1, theta2 = np.array(my_odd.get_motor_angles()) * np.array([-1, 1]) # flip sign
+        theta1, theta2 = np.array(my_odd.get_motor_angles()) * np.array([1, -1]) # flip sign
         print(f"rawtheta1: {theta1:.3f} | theta2: {theta2:.3f} | ", end="")
         theta1, theta2 = [theta1, theta2] + CALIB_POSITION - CALIB_MEASUREMENT
         print(f"theta1: {theta1:.3f} | theta2: {theta2:.3f}")

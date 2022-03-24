@@ -29,7 +29,7 @@ class PIDController(object):
 CONTROL_LOOP_TIME_S = 0.01
 MOTOR_AXIS_SIGN = np.array([-1,1])
 CALIB_POSITION = np.array([pi/2,-pi/2])
-CALIB_MEASUREMENT = np.array([-1.316,-2.99])
+CALIB_MEASUREMENT = np.array([1.45,1.73])
 
 class MyProcess(Process):
     def __init__(self):
@@ -73,9 +73,9 @@ class MyProcess(Process):
             self.send_msg("Odrive configured!")
 
             # set up controller parameters
-            Kp = 2.75/2
-            Ki = 0.5
-            Kd = 0.25*(Kp)**.5
+            Kp = 1.0
+            Ki = 0.
+            Kd = 0.*(Kp)**.5
             tau = 30.
             controller = PIDController(Kp,Ki,Kd,tau)
             setpoint = np.array([pi/2,-pi/2])

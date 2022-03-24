@@ -18,14 +18,13 @@ except UnsupportedPythonError as e:
     sys.exit()
 
 print("Setting up Julia pareto-leg-control package... ")
-Pkg.activate("../pareto-leg-control") # This string points to the pareto-leg-control folder.
-Pkg.instantiate() # This needs to be called once ever. TODO: FIXME. This is bad practice.
-Main.include("../pareto-leg-control/ParetoLegControl.jl")
+Pkg.activate("../pareto-leg-control/LegControllers") # This string points to the pareto-leg-control folder.
 
 # bind included modules to variables:
-model = Main.Model
-designs = Main.Designs
-controller = Main.ComputedTorque
+from julia import LegControllers
+model = LegControllers.Model
+designs = LegControllers.Designs
+controller = LegControllers.ComputedTorque
 
 # design parameters for a sample robot.
 # design parameters, see Designs.jl for description of the arguments
@@ -140,4 +139,5 @@ while True:
 #
 #        # Setup next loop interation.
         prev_time_s = curr_time_s
+
 
