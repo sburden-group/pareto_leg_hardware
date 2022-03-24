@@ -11,7 +11,7 @@ from numpy import pi
 ## Calibration Constants for such that the controller and the real-world
 ## joint angles match.
 CALIB_POSITION = np.asarray([pi/2, -pi/2]) # [rad]. Calibration "stance"
-CALIB_MEASUREMENT = np.asarray([.110, -4.50])   # Measured real-world angles
+CALIB_MEASUREMENT = np.asarray([.191, -4.51])   # Measured real-world angles
                                                 # when the robot is in the
                                                 # calibration "stance".
 

@@ -55,8 +55,9 @@ my_odd.set_torque_control_mode()
 
 ## Calibration Constants for such that the controller and the real-world
 ## joint angles match.
-CALIB_POSITION = np.asarray([pi/2, -pi/2]) # [rad]. Calibration "stance"
-CALIB_MEASUREMENT = np.asarray([-1.316, -2.99])   # Measured real-world angles
+MOTOR_SIGN = np.array([1.,-1.])
+CALIB_POSITION = np.array([pi/2, -pi/2]) # [rad]. Calibration "stance"
+CALIB_MEASUREMENT = np.array([.191, -4.51])   # Measured real-world angles
                                                   # when the robot is in the
                                                   # calibration "stance".
 
@@ -73,7 +74,7 @@ def get_state():
 
     # First compute q.
     # note: handle motor sign flip.
-    thetas = my_odd.get_motor_angles()*np.array([-1,1])
+    thetas = my_odd.get_motor_angles()*MOTOR_SIGN
     thetas = thetas + CALIB_POSITION - CALIB_MEASUREMENT
     theta1, theta2 = thetas
 
@@ -87,7 +88,7 @@ def get_state():
     # Now compute qdot
     # x_foot_dot and y_foot_dot are unknown at this point and unused to compute r.
     # note: handle motor sign flip.
-    theta1_dot, theta2_dot = my_odd.get_motor_velocities()*np.array([-1, 1])
+    theta1_dot, theta2_dot = my_odd.get_motor_velocities()*MOTOR_SIGN
 
     qdot = np.array([0, theta1_dot, theta2_dot, 0, 0])
     # Compute the jacobian of our leg's constraints.
