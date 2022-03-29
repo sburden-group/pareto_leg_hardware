@@ -2,7 +2,7 @@
 This is a CAD snapshot (Solidworks 2020) of the Pareto Leg.
 
 ## Summary
-This model is modeled "[Top-Down](https://help.solidworks.com/2018/english/SolidWorks/sldworks/c_Top-Down_Design_Overview.htm#:~:text=In%20top%2Ddown%20assembly%20design,moves%20down%20to%20the%20parts.)," where most of the structural parts are driven from parameters in a single part.
+This model is modeled "[Top-Down](https://help.solidworks.com/2018/english/SolidWorks/sldworks/c_Top-Down_Design_Overview.htm#:~:text=In%20top%2Ddown%20assembly%20design,moves%20down%20to%20the%20parts.)," where most of the structural parts are driven from parameters in *main\_body\_sketch.SLDPRT*.
 The advantage is that variables can be tweaked from one file, and the rest of the top assembly will resize to accommodate the changes.
 The top assembly also contains several *Configurations* with predefined parameters that will resize the model to create a particular leg instance.
 
