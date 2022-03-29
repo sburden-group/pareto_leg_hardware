@@ -3,7 +3,7 @@
 Here's a quick walkthrough on exporting leg assemblies with custom dimenionsions.
 
 ## Configuraiton Overview
-Many parts in the assembly are driven from a single part (`main\_body\_sketch.SLDPRT`) with many configurations, each of which has parameters set to different values.
+Many parts in the assembly are driven from a single part (`main_body_sketch.SLDPRT`) with many configurations, each of which has parameters set to different values.
 The assembly itself also several configurations, each of which represent a different leg designs at a particular point in the design space.
 This assembly configuration is built from parts pinned to a particular configuration.
 
