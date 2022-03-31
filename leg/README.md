@@ -18,6 +18,12 @@ If you need to make model changes, follow the guidelines in [editng_the_cads.md]
 * Soldering iron (for installing heat set inserts)
 * Soldering iron Heat Set Insert Installation Tip, [Amazon](https://www.amazon.com/Heat-Set-Inserts-Compatible-SP40NKUS-Connecting/dp/B08B17VQLD)
 
+## Stainless Steel Parts
+Flat stainless steel parts (spring anchors) need to be sourced externally.
+All spring anchors can be fabricated externally from [SendCutSend](https://sendcutsend.com/).
+Simply import a DXF and specify *0.8mm thick 304 Stainless Steel* as the material.
+(Pricing is ~$30 for about 10 spring anchors, and turnaround time is about 1 week.)
+
 ## Carbon Fiber Parts
 Carbon Fiber Parts need to be sourced externally.
 All carbon fiber parts can be fabricated externally from [CNCMadness.com](https://cncmadness.com/).
@@ -36,11 +42,28 @@ Conventional high speed steel tools will dull immediately.
 
 ## 3D Printed Parts
 
+The following parts need to be 3D printed
+### TODO
+* this
+* also this
+* this one too
+
+### Printed Part Settings
+* 0.2mm or 0.24mm thick layer lines
+* PLA or HTPLA
+* print in the provided STL orientations
+* 6 perimeter layers (This is critical especially for parts with inserts)
+
+### Post Processing
+The Foot Piece needs to have its 7mm hole drilled out, and then two 5mm bushing need to be pressed in, one from either end.
+(You can use the same 7mm carbon fiber drill bit also used on the carbon fiber parts.)
+
 ## (3D Printed) Parts with Inserts
+Some parts need heat-set inserts installed into them.
+To install these, use a heat-set insert tip
 
 ## Stainless Steel Guide Tube
-This thin-walled tube comes from McMaster-Carr and must be cut to length with a pipe cutter.
-
+This thin-walled tube comes from McMaster-Carr and must be cut to length with a pipe cutter. Length varies depending on design.
 
 # Assembly
 These robot legs can be assembled by you (or by some eager mechanically-curious undergrads).
