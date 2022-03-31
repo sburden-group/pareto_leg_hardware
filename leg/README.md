@@ -8,6 +8,28 @@ The top assembly also contains several *Configurations* with predefined paramete
 
 If you need to make model changes, follow the guidelines in [editng_the_cads.md](./editing_the_cads.md)
 
+
+## Fabrication Notes
+Some parts need to be sourced externally.
+All carbon fiber parts can be fabricated externally from [CNCMadness.com](https://cncmadness.com/).
+Just send him a DXF and specify *6mm plain weave carbon fiber*.
+(Pricing is < $200 for two leg setups.)
+
+### Post Processing
+Parts from CNC Madness will need to be touched up before they can be used.
+Specifically, the holes need to be cleaned up with a 7mm drill bit and a 5mm bushin needs to be installed in each joint hole.
+
+### Warnings:
+Carbon fiber is both sharp and very abrasive.
+It can be wet-sanded to reduce the risk of injuring people who run their hands along the edge.
+You must use carbide tooling to work with carbon fiber.
+Conventional high speed steel tools will dull immediately.
+
+
+## Fabrication Tools
+* Drill Press
+* 7mm Carbide Drill bit, [McMaster-Carr](https://www.mcmaster.com/3030A34/)
+
 ## Assembly Tools
 You will need:
 * 2mm Ball End Hex Key, [McMaster-Carr](https://www.mcmaster.com/5497A52/)
