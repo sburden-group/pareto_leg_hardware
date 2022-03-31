@@ -4,3 +4,6 @@
 [submodule "leg/software/pareto-leg-control"]
 	path = leg/software/pareto-leg-control
 	url = git@github.com:sburden-group/pareto-leg-control.git
+[submodule "leg/odrive_firmware/ODrive"]
+	path = leg/odrive_firmware/ODrive
+	url = git@github.com:sburden-group/ODrive.git
