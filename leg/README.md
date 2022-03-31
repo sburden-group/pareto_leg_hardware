@@ -6,6 +6,8 @@ This model is modeled "[Top-Down](https://help.solidworks.com/2018/english/Solid
 The advantage is that variables can be tweaked from one file, and the rest of the top assembly will resize to accommodate the changes.
 The top assembly also contains several *Configurations* with predefined parameters that will resize the model to create a particular leg instance.
 
+If you need to make model changes, follow the guidelines in [editng_the_cads.md](./editing_the_cads.md)
+
 ## Assembly Tools
 You will need:
 * 2mm Ball End Hex Key, [McMaster-Carr](https://www.mcmaster.com/5497A52/)
