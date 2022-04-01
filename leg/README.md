@@ -73,7 +73,9 @@ The Foot Piece needs to have its 7mm hole drilled out, and then two 5mm bushing 
 
 ## (3D Printed) Parts with Inserts
 Some parts need heat-set inserts installed into them.
-To install these, use a heat-set insert tip
+To install these, use a soldering iron with a heat-set insert tip and follow the [plate press technique](https://hackaday.com/2019/02/28/threading-3d-printed-parts-how-to-use-heat-set-inserts/).
+Doing so should yield excellent surface finish with minimal blobbing.
+![](./pics/heat_set_insert_examples.jpg)
 
 ## Stainless Steel Guide Tube
 This thin-walled tube comes from McMaster-Carr and must be cut to length with a pipe cutter. Length varies depending on design.
