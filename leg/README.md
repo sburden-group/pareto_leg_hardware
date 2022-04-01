@@ -78,7 +78,8 @@ Doing so should yield excellent surface finish with minimal blobbing.
 ![](./pics/heat_set_insert_examples.jpg)
 
 ## Stainless Steel Guide Tube
-This thin-walled tube comes from McMaster-Carr and must be cut to length with a pipe cutter. Length varies depending on design.
+This thin-walled tube comes from McMaster-Carr and can be cut to length with a pipe cutter. Length varies depending on design.
+![](./pics/tube_cutting.jpg)
 
 # Assembly
 These robot legs can be assembled by you (or by some eager mechanically-curious undergrads).
