@@ -42,17 +42,30 @@ Conventional high speed steel tools will dull immediately.
 
 ## 3D Printed Parts
 
-The following parts need to be 3D printed
-### TODO
-* this
-* also this
-* this one too
-
 ### Printed Part Settings
+Print the following parts with these settings.
+Note that exceptions exist, though.
+See the notes for exceptions to these settings.
+
 * 0.2mm or 0.24mm thick layer lines
 * PLA or HTPLA
 * print in the provided STL orientations
 * 6 perimeter layers (This is critical especially for parts with inserts)
+* No support material
+
+| **Qty** |                                                                    **Part Link**                                                                   |                                                                                                     **Notes**                                                                                                    |
+|:-------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|    1    | [Foot](./fabrication_exports/stls/foot.STL)                                                                                                        | Print with ~20 perimeter layers to create a solid object. Print from something more impact resistant than PLA, perhaps [CF HTPLA](https://www.proto-pasta.com/products/light-grey-carbon-fiber-composite-htpla). |
+|    1    | [Threaded Foot Tip](./fabrication_exports/stls/threaded_foot_tip.STL)                                                                              | Print from TPU or something rubbery                                                                                                                                                                              |
+|    2    | [Knee Bumper](./fabrication_exports/stls/knee_bumpter.STL)                                                                                         |                                                                                                                                                                                                                  |
+|    2    | [Pogo Bearing Spacer](./fabrication_exports/stls/pogo_bearing_spacer.STL)                                                                          |                                                                                                                                                                                                                  |
+|    2    | [Knee Spring Anchor](./fabrication_exports/stls/knee_bumper.STL)                                                                                   |                                                                                                                                                                                                                  |
+|    2    | [Pogo Center Tabs](./fabrication_exports/stls/pogo_center_tab.STL)                                                                                 |                                                                                                                                                                                                                  |
+|    2    | [Pogo Center Tube Retainer](./fabrication_exports/stls/pogo_center_tube_retainer.STL)                                                              | can also be laser cut from 3.175mm Delrin sheet                                                                                                                                                                  |
+|    2    | [Inc Encoder Shaft Adaptor](./fabrication_exports/stls/inc_encoder_shaft_adaptor.STL)                                                              | can also be laser cut from 3.175mm Delrin sheet. Only needed if using AMT102-V encoders.                                                                                                                         |
+|    2    | [Inc Encoder Shaft](./fabrication_exports/stls/incremental_encoder_shaft.STL)                                                                      | Print *with* support material. Only needed if using AMT102-V encoders.                                                                                                                                           |
+|    8    | [M3 8mm Spacer](./fabrication_exports/stls/8mm_m3_spacer.STL)                                                                                      |                                                                                                                                                                                                                  |
+|    1    | [Base Plate](./fabrication_exports/stls/base_plate.STL) or [No-Knee Springs Base Plate](./fabrication_exports/stls/base_plate_no_knee_springs.STL) | two different sizes depending on if the design uses knee springs or not.                                                                                                                                         |
 
 ### Post Processing
 The Foot Piece needs to have its 7mm hole drilled out, and then two 5mm bushing need to be pressed in, one from either end.
