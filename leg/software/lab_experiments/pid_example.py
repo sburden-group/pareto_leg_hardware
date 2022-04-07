@@ -26,10 +26,9 @@ class PIDController(object):
     def reset(self):
         self.integrator = 0.
 
-CONTROL_LOOP_TIME_S = 0.01
-MOTOR_AXIS_SIGN = np.array([-1,1])
-CALIB_POSITION = np.array([pi/2,-pi/2])
-CALIB_MEASUREMENT = np.array([1.45,1.73])
+CONTROL_LOOP_TIME_S = 0.005
+CALIB_POSITION = np.array([np.pi/2,np.pi/2])
+CALIB_MEASUREMENT = np.array([.195,4.5])
 
 class MyProcess(Process):
     def __init__(self):
@@ -89,11 +88,11 @@ class MyProcess(Process):
                     dt = curr_time - prev_time
                     prev_time = curr_time
                     q,qdot = self.get_motor_state()
-                    u = controller.update(setpoint,q,qdot,dt)
-                    self.set_torques(u)
-                    error = setpoint-q
-                    msg = "Norm of error: %.3f" % np.linalg.norm(error)
-                    self.send_msg(msg)
+                    # u = controller.update(setpoint,q,qdot,dt)
+                    self.set_torques(np.zeros(2))
+                    # error = setpoint-q
+                    # msg = "Norm of error: %.3f" % np.linalg.norm(error)
+                    self.send_msg(dt)
         except Exception:
             self.send_msg("Error encountered...")
             etype, value, tb = sys.exc_info()
@@ -103,7 +102,7 @@ class MyProcess(Process):
 
     def get_motor_state(self):
         # Get Measurements: flip sign on motor 0 to match world configuration. (see pic)
-        thetas = np.array(self.odrive.get_motor_angles()) * MOTOR_AXIS_SIGN # flip sign
+        thetas = np.array(self.odrive.get_motor_angles())
         q = thetas + CALIB_POSITION - CALIB_MEASUREMENT
         # Clamp thetas to within (-2pi, +2pi) range
         for i in range(len(thetas)):
@@ -111,11 +110,11 @@ class MyProcess(Process):
                 thetas[i] += 4*pi
             while thetas[i] > 2*pi:
                 thetas[i] -= 4*pi
-        qdot = np.array(self.odrive.get_motor_velocities()) * MOTOR_AXIS_SIGN # flip sign.
+        qdot = np.array(self.odrive.get_motor_velocities())
         return q,qdot
 
     def set_torques(self,torques):
-        self.odrive.set_torques(*(torques * MOTOR_AXIS_SIGN))
+        self.odrive.set_torques(*(torques))
 
     def shutdown_odrive(self):
         self.odrive.set_torques(0.,0.)

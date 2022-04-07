@@ -140,8 +140,8 @@ class OdriveDriver(Inpromptu):
         """
         # *.pos_estimate is the estimated angle after running through the
         # state observer to correct encoder phase lag.
-        return (self.od.axis0.encoder.pos_estimate* 2 * pi,
-                self.od.axis1.encoder.pos_estimate* 2 * pi)
+        return (self.od.axis0.encoder.pos_circular* 2 * pi,
+                self.od.axis1.encoder.pos_circular* 2 * pi)
 
 
     @cli_method
