@@ -21,16 +21,14 @@ LIBOPENCM3_DIR=./libopencm3
 DEBUG = 0 # Set to 1 for debug compilation flags.
 OPT = -Og # Optimization level
 
+# path for input files
+SOURCE_DIR = src
+
 # path for output files
 BUILD_DIR = build
 
 # C++ source files
-CPP_SOURCES =  \
-src/main.cpp \
-src/analog_input.cpp \
-src/millis.cpp \
-src/usbd_setup.cpp
-# Add more source files here.
+CPP_SOURCES:= $(shell find $(SOURCE_DIR) -name '*.cpp')
 
 # C source files
 C_SOURCES = \
