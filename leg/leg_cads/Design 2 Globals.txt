@@ -1,0 +1,11 @@
+﻿"l2"= 185
+"l1"= 85
+"s1r"= 2.14212rad
+"s2r"= - 2rad
+"offset"= 10mm
+"s1_len"= 0.08255m
+"s2_len"= 0.015m
+"s1_anchor_dist"= "offset" + "l1" + "s1_len"
+"s2_anchor_dist"= "offset" + "l1" + "s2_len"'this was: = "offset" + "l1" + "s2_len"
+"carbon_fiber_plate_thickness"=6
+"motor_to_motor_spacing"=55.5
