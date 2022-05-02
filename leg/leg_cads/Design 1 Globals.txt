@@ -1,0 +1,23 @@
+﻿"l2" = 191
+"D3@Body Driving Dimensions" = "l2"
+"l1" = 104
+"D4@Body Driving Dimensions" = "l1"
+"s1r" = 135deg
+"s2r" = - 135deg
+"offset"= 10mm
+"s1_len" = 0mm
+"s2_len" = 0mm
+"s1_anchor_dist"= "offset" + "l1" + "s1_len"
+"s2_anchor_dist"= "offset" + "l1" + "s2_len"'this was: = "offset" + "l1" + "s2_len"
+"D5@Body Driving Dimensions" = "s1_anchor_dist"
+"D6@Body Driving Dimensions" = "s2_anchor_dist"
+"D7@Body Driving Dimensions" = "s1r"
+"D8@Body Driving Dimensions" =  - "s2r"
+"carbon_fiber_plate_thickness"=6
+"motor_to_motor_spacing"=55.5
+"D1@Sketch4"="motor_to_motor_spacing"
+"D1@Boss-Extrude3"="l1"+"l2" + 8
+"D1"= "motor_to_motor_spacing" + 30mm
+"D10@Body Driving Dimensions"="offset"+5mm
+"D12@Body Driving Dimensions"="offset"+5mm
+"D4@side plate profile"="l1"+"offset"

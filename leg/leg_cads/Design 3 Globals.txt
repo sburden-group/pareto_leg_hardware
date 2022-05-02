@@ -1,9 +1,9 @@
-﻿"l2"= 185
-"l1"= 85
-"s1r"= 2.14212rad
+﻿"l2" = 182.421
+"l1" = 87.579
+"s1r" = 2.356194rad
 "s2r"= - 135deg
 "offset"= 10mm
-"s1_len"= 0.08255m
+"s1_len" = 76.2mm
 "s2_len" = 0mm
 "s1_anchor_dist"= "offset" + "l1" + "s1_len"
 "s2_anchor_dist"= "offset" + "l1" + "s2_len"'this was: = "offset" + "l1" + "s2_len"
@@ -11,7 +11,7 @@
 "motor_to_motor_spacing"=55.5
 "D1"= "motor_to_motor_spacing" + 30mm
 "pogo_spacer_offset"= 15mm + 6.38mm
-"cspring len"= 125.806mm
+"cspring len" = 116.586
 "cspring mult" = 2
 "cspring_spacer_depth"= "l1" + "l2" - "cspring len" * "cspring mult" - "pogo_spacer_offset"
 "D1@Boss-Extrude1"="cspring_spacer_depth"
