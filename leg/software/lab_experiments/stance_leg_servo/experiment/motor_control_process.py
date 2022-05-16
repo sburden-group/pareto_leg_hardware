@@ -8,10 +8,8 @@ import odrive
 import leg_controllers.model as model
 from leg_controllers.designs import Params
 import leg_controllers.hopper as hopper
-from stance_control import StanceController
-from flight_control import FlightController
-from pid_controller import PIDController
-from reference_trj import reference
+from .stance_control import StanceController 
+from .pid_controller import PIDController
 from multiprocessing import Process, Pipe, Queue, Event
 from queue import Empty as queue_empty
 from math import remainder
@@ -23,7 +21,7 @@ This process implements the motor control loop and sends motor telemetry to the 
 program.
 """
 class MotorControl(Process):
-    def __init__(self, leg_params : Params, motor_config, push_force, switching_time):
+    def __init__(self, leg_params : Params, motor_config):
         super().__init__()
         self.stop_event = Event()
         self.msg_pipe = Pipe()                      # for sending debug messages to main program
@@ -35,9 +33,8 @@ class MotorControl(Process):
         self.calibration_pos = np.array(motor_config["calibration position"])
         self.calibration_meas = np.array(motor_config["calibreation measurement"])
         self.pid_controller = PIDController(100.,100.,0.,300.)
-        self.pid_target = leg_params.l1+leg_params.l2-.1
-        self.stance_controller = StanceController(leg_params,push_force,switching_time)
-        self.flight_controller = FlightController(leg_params)
+        self.pid_target = leg_params.l1+leg_params.l2-.12
+        self.stance_controller = StanceController(leg_params)
         self.state = "init"
 
 
@@ -83,21 +80,12 @@ class MotorControl(Process):
             return data
 
     def controller(self,q,qdot,t,dt):
+        current = np.zeros(2)
         if self.state == "init":
-            return np.zeros(2)
-        elif self.state == "pid control":
-            a = np.array([self.pid_controller.update(self.pid_target,q[0],0.,dt)])
-            torques = hopper.stance_computed_torque(q,qdot,a,self.leg_params)
-            return torques / model.Ke
-        elif self.state == "pushoff":
-            return np.array([-20,-20])
-        elif self.state == "passive stance":
-            return hopper.stance_control(q,qdot,self.leg_params)/model.Ke
-        elif self.state == "flight control":
-            return self.flight_controller.output(q,qdot,dt)
+            pass
         elif self.state == "stance control":
-            current = self.stance_controller.control(q,qdot,t,dt)
-            return current
+            current = self.stance_controller.output(q,qdot,dt)
+        return current
 
     def run(self):
         import psutil, os
@@ -138,51 +126,16 @@ class MotorControl(Process):
                     q,qdot = self.get_leg_state()
                     current = self.controller(q,qdot,curr_time,dt)
                     self.set_current(current)
+                    self.send_msg(q[0])
+                    self.send_msg(current)
+                    # self.send_msg(q[0])
+                    # self.send_msg(qdot[[3,4]])
+                    # self.send_msg(hopper.potential_energy(q,self.leg_params))
+                    # self.send_msg(q[0])
                     if self.state == "init":
-                        if abs(qdot[0])<1e-3:
-                            self.pid_controller.reset()
-                            self.state = "pid control"
-                    elif self.state == "pid control":
-                        if abs(self.pid_target-q[0]) < 1e-2:
-                            self.state = "pushoff"
-                            self.send_msg(self.state)
-                    elif self.state == "pushoff":
-                        ymax = self.leg_params.l1+self.leg_params.l2
-                        if q[0] > ymax:
-                            self.state = "flight control"
-                            self.flight_controller.initialize()
-                            self.send_msg(self.state)
-                    elif self.state == "flight control":
-                        ymax = self.leg_params.l1+self.leg_params.l2
-                        flight_trj.append({'u':current, 'q': q, 'qdot': qdot, 't': curr_time, 'dt': dt})
-                        if q[0] < ymax:
-                            if hop_count == 0:
-                                hop_count += 1
-                                flight_trj = []
-                                stance_trj = []
-                                self.state = "stance control"
-                                self.send_msg(self.state)
-                                self.stance_controller.initialize(q,qdot,curr_time)
-                            elif hop_count < 10:
-                                hop_count += 1
-                                self.telemetry_queue.put((stance_trj,flight_trj))
-                                stance_trj = []
-                                flight_trj = []
-                                self.state = "stance control"
-                                self.send_msg(self.state)
-                                self.stance_controller.initialize(q,qdot,curr_time)
-                            else:
-                                self.send_msg("fuck2")
-                                self.telemetry_queue.put((stance_trj,flight_trj))
-                                self.stop_event.set()
-                                break
+                        self.state = "stance control"
                     elif self.state == "stance control":
-                        stance_trj.append({'u':current, 'q': q, 'qdot': qdot, 't': curr_time, 'dt': dt})
-                        ymax = self.leg_params.l1+self.leg_params.l2
-                        if q[0] > ymax:
-                            self.state = "flight control"
-                            self.flight_controller.initialize()
-                            self.send_msg(self.state)
+                        pass
             self.set_current(np.zeros(2))
             self.send_msg("end motor control process")
             self.shutdown_odrive()
@@ -219,7 +172,6 @@ class MotorControl(Process):
         
     def set_current(self,current):
         """ Sends current commands to the odrive. """
-        current = np.clip(current,-25.,25.)
         self.odrive.set_torques(*(self.axis_sign*current))
 
     def shutdown_odrive(self):
