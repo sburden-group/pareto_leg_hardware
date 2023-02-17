@@ -6,8 +6,8 @@ import numpy as np
 class FlightController():
     def __init__(self, leg_params):
         self.params = leg_params
-        self.pid = PIDController(225,200.,0.,10.)
-        self.setpoint = np.array([np.pi/8,np.pi/8-.2])
+        self.pid = PIDController(225,200.,5.,10.)
+        self.setpoint = np.array([0.,0.])
     
     def initialize(self):
         self.pid.reset()
@@ -15,7 +15,5 @@ class FlightController():
     def output(self, q, qdot, dt):
         p = hopper.flight_anchor_projection(q,self.params)
         pdot = hopper.flight_anchor_pushforward(q,self.params) @ qdot
-        u = self.pid.update(np.zeros(2),p,pdot,dt)
-        # feed_forward_current = np.array([-.5,-.5])
-        # spring_current = hopper.flight_control(q,qdot,self.params)/model.Ke
+        u = self.pid.update(self.setpoint,p,pdot,dt)
         return hopper.flight_computed_torque(q,qdot,u,self.params)/model.Ke

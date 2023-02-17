@@ -14,12 +14,14 @@ parser = argparse.ArgumentParser(
 parser.add_argument('output_file',type=str)
 parser.add_argument('design', type=str, help="YAML file containing the design parameters")
 parser.add_argument('config', type=str, help="YAML file containing motor calibration data (calibration position, measurement, axis sign")
+parser.add_argument('pull_force', type=float)
 parser.add_argument('push_force', type=float)
 parser.add_argument('switching_time',type=float)
 
 def main(output_file: str, 
         design: str, 
         config: str,
+        pull_force: float,
         push_force: float,
         switching_time: float):
     try:
@@ -29,7 +31,7 @@ def main(output_file: str,
         motor_config = None
         with open(config,"r") as file:
             motor_config = yaml.load(file,yaml.Loader) 
-        motorcontrol = MotorControl(leg_params, motor_config,push_force,switching_time)
+        motorcontrol = MotorControl(leg_params,motor_config,pull_force,push_force,switching_time)
         keyboard.add_hotkey('alt+q',lambda: motorcontrol.stop())
         motorcontrol.start()
         start_time = perf_counter()

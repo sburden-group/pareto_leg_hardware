@@ -3,8 +3,6 @@ import sys, signal, traceback
 from time import perf_counter, sleep
 import numpy as np
 from scipy.linalg import expm
-from pareto_leg.odrive_driver import OdriveDriver
-import odrive
 import leg_controllers.model as model
 from leg_controllers.designs import Params
 import leg_controllers.hopper as hopper
@@ -13,6 +11,8 @@ from .pid_controller import PIDController
 from multiprocessing import Process, Pipe, Queue, Event
 from queue import Empty as queue_empty
 from math import remainder
+import asyncio
+import motor_interface
 
 CONTROL_LOOP_TIME_S = 0.01
 
@@ -27,16 +27,14 @@ class MotorControl(Process):
         self.msg_pipe = Pipe()                      # for sending debug messages to main program
         self.err_pipe = Pipe()                      # for transmitting errors to main program
         self.telemetry_queue = Queue(-1)           # for sending system telemetry to main program
-        self.odrive = None
+        self.motors = None
         self.leg_params = leg_params
         self.axis_sign = np.array(motor_config["motor axis sign"])
         self.calibration_pos = np.array(motor_config["calibration position"])
-        self.calibration_meas = np.array(motor_config["calibreation measurement"])
-        self.pid_controller = PIDController(100.,100.,0.,300.)
+        self.calibration_meas = np.array(motor_config["calibration measurement"])
         self.pid_target = leg_params.l1+leg_params.l2-.12
         self.stance_controller = StanceController(leg_params)
         self.state = "init"
-
 
     def stop(self):
         """ triggers shutdown of this process through the stop event"""
@@ -94,23 +92,10 @@ class MotorControl(Process):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         try:
             # configure odrive
-            self.send_msg("Configuring Odrive...")
-            self.odrive = OdriveDriver(odrive.find_any())
-            self.odrive.set_torque_control_mode()
-            self.odrive.arm()
-            self.send_msg("Odrive configured!")
-            # we have been having some weird startup problems with latency
-            # so the following loop is a dummy loop to try and wait out this problem
-            count = 0
-            prev_time = perf_counter()
-            while count < 3:
-                curr_time = perf_counter()
-                if curr_time - prev_time >= CONTROL_LOOP_TIME_S:
-                    count += 1
-                    dt = curr_time - prev_time
-                    prev_time = curr_time
-                    q,qdot = self.get_leg_state()
-                    self.set_current(np.zeros(2))
+            self.send_msg("Connecting to motors...")
+            self.motors = motor_interface.MoteusInterface(1,2)
+            asyncio.run(self.motors.connect())
+            self.send_msg("Connected!")
             # the control loop
             prev_time = perf_counter() 
             self.send_msg("Starting control loop!")
@@ -123,22 +108,17 @@ class MotorControl(Process):
                 if curr_time - prev_time >= CONTROL_LOOP_TIME_S:
                     dt = curr_time - prev_time
                     prev_time = curr_time
-                    q,qdot = self.get_leg_state()
+                    motor_state = asyncio.run(self.motors.query_state())
+                    q,qdot = self.get_leg_state(motor_state)
                     current = self.controller(q,qdot,curr_time,dt)
                     self.set_current(current)
-                    self.send_msg(q[0])
-                    self.send_msg(current)
-                    # self.send_msg(q[0])
-                    # self.send_msg(qdot[[3,4]])
-                    # self.send_msg(hopper.potential_energy(q,self.leg_params))
-                    # self.send_msg(q[0])
                     if self.state == "init":
                         self.state = "stance control"
                     elif self.state == "stance control":
                         pass
             self.set_current(np.zeros(2))
             self.send_msg("end motor control process")
-            self.shutdown_odrive()
+            self.shutdown_controllers()
             while not self.telemetry_queue.empty():
                 # waiting for the parent process to consume our data
                 pass 
@@ -149,18 +129,17 @@ class MotorControl(Process):
             self._send_err(etype,value,tb)
             self.stop_event.set()
 
-    def get_motor_state(self):
-        # Get Measurements: flip sign on motor 0 to match world configuration. (see pic)
-        thetas =  self.axis_sign*np.array(self.odrive.get_motor_angles())
+    def get_joint_state(self, motor_state):
+        thetas = self.axis_sign*motor_interface.get_motor_angles(motor_state)
         thetas = thetas+self.calibration_pos-self.calibration_meas
         thetas[0] = remainder(thetas[0],2*np.pi)
         thetas[1] = remainder(thetas[1],2*np.pi)
-        thetasdot = self.axis_sign*np.array(self.odrive.get_motor_velocities())
+        thetasdot = self.axis_sign*motor_interface.get_motor_velocities(motor_state)
         return thetas, thetasdot
 
-    def get_leg_state(self):
+    def get_leg_state(self, motor_state):
         """ Computes the full state of the robot from the joint angles and velocities. """
-        theta, theta_dot = self.get_motor_state()
+        theta, theta_dot = self.get_joint_state(motor_state)
         hip_foot_angle = model.hip_foot_angle(*theta)
         r = model.leg_length(model.interior_leg_angle(*theta),self.leg_params)
         q = np.array([r*np.cos(hip_foot_angle),theta[0],theta[1],r*np.sin(hip_foot_angle),0.])
@@ -171,10 +150,8 @@ class MotorControl(Process):
         return q,qdot
         
     def set_current(self,current):
-        """ Sends current commands to the odrive. """
-        self.odrive.set_torques(*(self.axis_sign*current))
+        """ Sends current commands to the motors """
+        asyncio.run(self.motors.set_current(*(self.axis_sign*current)))
 
-    def shutdown_odrive(self):
-        """ Shuts down the odrive. """
-        self.odrive.set_torques(0.,0.)
-        self.odrive.disarm()
+    def shutdown_controllers(self):
+        asyncio.run(self.motors.stop())

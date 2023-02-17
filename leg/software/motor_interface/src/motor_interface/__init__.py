@@ -1,6 +1,7 @@
 import moteus
 import asyncio
 from numpy import pi
+
 class ConnectionError(Exception):
     pass
 
@@ -34,16 +35,12 @@ class MoteusInterface():
         return [await m.query() for m in self.motors]        
 
     async def set_current(self, *i):
+        futures = []
         for j in range(len(i)):
-            await self.motors[j].set_current(d_A = 0,q_A = i[j], query=False)
+            futures += [await self.motors[j].set_current(d_A = 0, q_A = i[j], query=False)]
+        return futures
 
     async def stop(self):
         for m in self.motors:
-            await m.make_stop()
+            await m.set_stop()
        
-async def main():
-    moteus_interface = MoteusInterface(42)
-    await moteus_interface.connect()
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -63,9 +63,10 @@ class Experiment(threading.Thread): # makes sense maybe to make this a thread in
                     self.motor_controller.set_computed_torque_mode(target)
                     while not self.stop_event.is_set():
                         if self.state == "init":
-                            data = self.motor_controller.empty_queue()
+                            self.motor_controller.empty_queue()
+                            data = self.motor_controller.telemetry_queue.get()
                             if data is not None:
-                                q = data[-1]["q"]
+                                q = data["q"]
                                 error = target - q[[3,4]]
                                 if np.linalg.norm(error) < Experiment.INIT_ERROR_NORM or (perf_counter()-start_time) > Experiment.INIT_TIMEOUT:
                                     self.state = "rollout"
@@ -82,4 +83,7 @@ class Experiment(threading.Thread): # makes sense maybe to make this a thread in
         if not self.stop_event.is_set():
             self.write_index(init_conds)
             self.writer.save()
+
+    def stop(self):
+        self.stop_event.set()
 
